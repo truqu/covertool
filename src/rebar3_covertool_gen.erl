@@ -69,7 +69,8 @@ generate_import( [File | T], LogFile ) ->
         ok ->
             generate_import( T, LogFile );
         Otherwise ->
-            rebar_api:info( "Error parsing file ~s : ~s", [File, Otherwise] ),
+            rebar_api:info( "Error parsing file ~s", [File] ),
+            rebar_api:info( "Error ~p", [Otherwise] ),
             generate_import( T, LogFile )
     end;
 generate_import( [], LogFile ) ->
