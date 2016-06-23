@@ -22,7 +22,7 @@ init( State ) ->
     NewState = rebar_state:add_provider(State, providers:create(Options)),
     {ok, NewState}.
 
-    
+
 do(State) ->
     OutputFiles = output_files(),
     InputFiles = input_files(),
@@ -45,7 +45,7 @@ output_files() ->
 input_files() ->
     CoverDataFiles = ["eunit.coverdata", "ct.coverdata"],
     [["_build/test/cover/" | File] || File <- CoverDataFiles].
-    
+
 
 generate( OutputFiles, InputFiles, Apps ) ->
     %% blow away any output files (if present), and make directory exist
@@ -66,16 +66,17 @@ generate_init( InputFiles, LogFilePath ) ->
 generate_import( [File | T], LogFile ) ->
     rebar_api:info( "Importing file ~s", [File] ),
     case cover:import( File ) of
-        ok -> generate_import( T, LogFile );
+        ok ->
+            generate_import( T, LogFile );
         Otherwise ->
-            file:close( LogFile ),
-            Otherwise
+            rebar_api:info( "Error parsing file ~s : ~s", [File, Otherwise] ),
+            generate_import( T, LogFile )
     end;
 generate_import( [], LogFile ) ->
     {ok, LogFile}.
-            
 
-generate_apps( Apps, LogFile ) ->    
+
+generate_apps( Apps, LogFile ) ->
     Result = lists:foldl( fun generate_app/2, ok, Apps ),
     file:close( LogFile ),
     Result.
@@ -93,5 +94,3 @@ generate_app( App, Result ) ->
 
 outdir() ->
     "_build/test/covertool".
-
-        
